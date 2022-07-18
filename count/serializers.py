@@ -3,23 +3,34 @@ from rest_framework import serializers
 from count.models import Party, Member, Purchase
 
 
-class ExpensesSerializer(serializers.ModelSerializer):
+class PurchaseCreateSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Purchase
-        fields = '__all__'
+        fields = ('member', 'expenses', 'description')
+
+
+class PurchaseSerializer(serializers.ModelSerializer):
+
+    member = serializers.SlugRelatedField(
+        read_only=True,
+        slug_field='name'
+    )
+
+    class Meta:
+        model = Purchase
+        fields = ('id', 'member', 'expenses', 'description')
 
 
 class MembersSerializer(serializers.ModelSerializer):
-    expenses = ExpensesSerializer(source='member_purchase', many=True, read_only=True)
 
     class Meta:
         model = Member
-        fields = '__all__'
+        fields = ('id', 'name')
 
 
 class ListOfPartiesSerializer(serializers.ModelSerializer):
-    members = MembersSerializer(source='member_party', many=True, read_only=True)
+    members = MembersSerializer(source='member_set', many=True, read_only=True)
 
     class Meta:
         model = Party
@@ -27,7 +38,8 @@ class ListOfPartiesSerializer(serializers.ModelSerializer):
 
 
 class DetailPartySerializer(serializers.ModelSerializer):
+    members = MembersSerializer(source='member_set', many=True, read_only=True)
 
     class Meta:
         model = Party
-        fields = ('date', 'description')
+        fields = ('date', 'description', 'members', 'budget', 'member_count')

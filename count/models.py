@@ -65,13 +65,17 @@ class Party(models.Model):
 
     @property
     def member_count(self) -> int:
-        return self.member_party.all().count()
+        return self.member_set.all().count()
+
+    @property
+    def budget(self) -> int:
+        return self.purchase.all().aggregate(Sum('expenses')).get('expenses__sum')
 
 
 class Member(models.Model):
     user = models.ForeignKey(PartyUser, on_delete=models.CASCADE, related_name='user_party', blank=True, null=True)
     name = models.CharField("Участник", max_length=100)
-    party = models.ForeignKey(Party, on_delete=models.CASCADE, related_name='member_party')
+    party = models.ForeignKey(Party, on_delete=models.CASCADE)
 
     class Meta:
         verbose_name = 'Участник'

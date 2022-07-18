@@ -50,7 +50,7 @@ def party_handle(party: Party) -> [SenderReceiver]:
     receiver_queue = queue.Queue()
     sender_queue = queue.Queue()
 
-    for member in party.member_party.all():
+    for member in party.member_set.all():
         ###Для ресиверов
         if member.party_summary_purchases > member.get_member_usage_purchase():
             rest_of_money = member.party_summary_purchases - member.get_member_usage_purchase()

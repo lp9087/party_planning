@@ -40,7 +40,6 @@ INSTALLED_APPS = [
     'rest_framework',
     'debug_toolbar',
     'drf_yasg',
-    'phonenumber_field',
     'count',
 ]
 
