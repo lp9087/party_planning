@@ -18,12 +18,12 @@ class Party(models.Model):
 
     @property
     def member_count(self) -> int:
-        return self.dateparty.all().count()
+        return self.member_party.all().count()
 
 
 class Member(models.Model):
     name = models.CharField("Участник", max_length=100)
-    party = models.ForeignKey(Party, on_delete=models.CASCADE, related_name='dateparty')
+    party = models.ForeignKey(Party, on_delete=models.CASCADE, related_name='member_party')
 
     class Meta:
         verbose_name = 'Участник'
@@ -34,19 +34,19 @@ class Member(models.Model):
 
     @property
     def party_summary_purchases(self) -> float:
-        res = self.member_exp.all().aggregate(Sum('expenses')).get('expenses__sum')
+        res = self.member_purchase.all().aggregate(Sum('expenses')).get('expenses__sum')
         if res is None:
             return 0
         return res
 
     def get_member_usage_purchase(self):
-        purchases = self.party.date_exp.exclude(id__in=list(self.membering.all().values_list('purchase_id', flat=True)))
+        purchases = self.party.purchase.exclude(id__in=list(self.member_exclude.all().values_list('purchase_id', flat=True)))
         return sum([purchase.avg_price_on_purchase() for purchase in purchases])
 
 
 class Purchase(models.Model):
-    party = models.ForeignKey(Party, on_delete=models.CASCADE, related_name='date_exp')
-    member = models.ForeignKey(Member, on_delete=models.CASCADE, related_name='member_exp')
+    party = models.ForeignKey(Party, on_delete=models.CASCADE, related_name='purchase')
+    member = models.ForeignKey(Member, on_delete=models.CASCADE, related_name='member_purchase')
     expenses = models.DecimalField("Потратил", decimal_places=2, max_digits=10, default=0)
     description = models.CharField("Описание траты", max_length=500, blank=True, null=True)
 
@@ -58,12 +58,12 @@ class Purchase(models.Model):
         return f"{self.member} потратился на {self.description}"
 
     def avg_price_on_purchase(self):
-        return self.expenses/(self.party.member_count - self.purchasing.all().count())
+        return self.expenses/(self.party.member_count - self.purchase_exclude.all().count())
 
 
 class PurchaseExclude(models.Model):
-    purchase = models.ForeignKey(Purchase, on_delete=models.CASCADE, related_name='purchasing')
-    member = models.ForeignKey(Member, on_delete=models.CASCADE, related_name='membering')
+    purchase = models.ForeignKey(Purchase, on_delete=models.CASCADE, related_name='purchase_exclude')
+    member = models.ForeignKey(Member, on_delete=models.CASCADE, related_name='member_exclude')
 
     class Meta:
         verbose_name = 'Исключение'

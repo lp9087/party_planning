@@ -3,7 +3,8 @@ import queue
 from count.models import Member, Party
 
 
-class Receiver:
+class Role:
+
     def __init__(self, member: Member, rest_of_money: float):
         self.member = member
         self.rest_of_money = rest_of_money
@@ -12,13 +13,12 @@ class Receiver:
         self.rest_of_money = self.rest_of_money - money
 
 
-class Sender:
-    def __init__(self, member: Member, rest_of_money):
-        self.member = member
-        self.rest_of_money = rest_of_money
+class Receiver(Role):
+    pass
 
-    def change_rest_of_money(self, money: float) -> None:
-        self.rest_of_money = self.rest_of_money - money
+
+class Sender(Role):
+    pass
 
 
 class SenderReceiver:
@@ -45,14 +45,14 @@ def link_sender_receiver(sender: Sender, receiver: Receiver) -> SenderReceiver:
     return SenderReceiver(sender, receiver, send_money)
 
 
-def party_handle(party: Party) -> list[SenderReceiver]:
+def party_handle(party: Party) -> [SenderReceiver]:
     procest_member = []
     receiver_queue = queue.Queue()
     sender_queue = queue.Queue()
 
     for member in party.dateparty.all():
         ###Для ресиверов
-        if member.party_summary_purchases > member.get_member_usage_purchase():           #party.avg_check
+        if member.party_summary_purchases > member.get_member_usage_purchase():
             rest_of_money = member.party_summary_purchases - member.get_member_usage_purchase()
             receiver = Receiver(member, rest_of_money)
 

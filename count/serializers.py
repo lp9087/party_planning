@@ -11,7 +11,7 @@ class ExpensesSerializer(serializers.ModelSerializer):
 
 
 class MembersSerializer(serializers.ModelSerializer):
-    expenses = ExpensesSerializer(source='member_exp', many=True, read_only=True)
+    expenses = ExpensesSerializer(source='member_purchase', many=True, read_only=True)
 
     class Meta:
         model = Member
@@ -19,7 +19,7 @@ class MembersSerializer(serializers.ModelSerializer):
 
 
 class ListOfPartiesSerializer(serializers.ModelSerializer):
-    members = MembersSerializer(source='dateparty', many=True, read_only=True)
+    members = MembersSerializer(source='member_party', many=True, read_only=True)
 
     class Meta:
         model = Party

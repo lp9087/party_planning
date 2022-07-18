@@ -36,7 +36,7 @@ class CountExpenses(APIView):
 
     def get(self, request, id):
 
-        party = Party.objects.prefetch_related('dateparty', 'date_exp').get(id=id)
+        party = Party.objects.prefetch_related('member_party', 'purchase').get(id=id)
 
         response = []
         for member in party_handle(party):
