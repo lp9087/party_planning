@@ -38,8 +38,10 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
-    'count',
     'debug_toolbar',
+    'drf_yasg',
+    'phonenumber_field',
+    'count',
 ]
 
 MIDDLEWARE = [
@@ -131,3 +133,16 @@ INTERNAL_IPS = [
     "127.0.0.1",
     # ...
 ]
+
+CACHES = {
+    'default': {
+        'BACKEND': 'django_redis.cache.RedisCache',
+        'LOCATION': 'redis://default:redispw@localhost:49157',
+        'OPTIONS': {
+            'CLIENT_CLASS': 'django_redis.client.DefaultClient',
+        }
+    }
+}
+
+AUTH_USER_MODEL = 'count.PartyUser'
+
