@@ -136,7 +136,7 @@ INTERNAL_IPS = [
 CACHES = {
     'default': {
         'BACKEND': 'django_redis.cache.RedisCache',
-        'LOCATION': 'redis://default:redispw@localhost:49157',
+        'LOCATION': 'redis://default:redispw@localhost:49153',
         'OPTIONS': {
             'CLIENT_CLASS': 'django_redis.client.DefaultClient',
         }

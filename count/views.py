@@ -1,6 +1,7 @@
-from rest_framework import viewsets
+from rest_framework import viewsets, status
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from rest_framework.generics import ListCreateAPIView
 
 from count import serializers
 from count.models import Party, Member, Purchase
@@ -8,19 +9,15 @@ from count.models import Party, Member, Purchase
 from count.utils import party_handle
 
 
-class PurchaseViewSet(viewsets.ModelViewSet):
-    queryset = Purchase.objects.all()
-    #serializer_class = serializers.PurchaseSerializer
-    lookup_url_kwarg = "party_id"
+class PurchaseAPIView(ListCreateAPIView):
 
-    serializer_classes = {
-        'create': serializers.PurchaseCreateSerializer,
-        'list': serializers.PurchaseSerializer,
-    }
-    default_serializer_class = serializers.PurchaseSerializer
+    def get_queryset(self):
+        return Purchase.objects.filter(party_id=self.kwargs.get('party_id'))
 
     def get_serializer_class(self):
-        return self.serializer_classes.get(self.action, self.default_serializer_class)
+        if self.request.method == 'POST':
+            return serializers.PurchaseCreateSerializer
+        return serializers.PurchaseSerializer
 
 
 class MembersViewSet(viewsets.ModelViewSet):
@@ -37,7 +34,7 @@ class CountExpenses(APIView):
 
     def get(self, request, id):
 
-        party = Party.objects.prefetch_related('members', 'purchase').get(id=id)
+        party = Party.objects.prefetch_related('member_set', 'purchase').get(id=id)
 
         response = []
         for member in party_handle(party):
