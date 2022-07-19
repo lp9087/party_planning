@@ -68,6 +68,7 @@ class Party(models.Model):
         return self.member_set.all().count()
 
     @property
+    @check_cache('budget')
     def budget(self) -> int:
         return self.purchase.all().aggregate(Sum('expenses')).get('expenses__sum')
 
@@ -82,7 +83,7 @@ class Member(models.Model):
         verbose_name_plural = 'Участники'
 
     def __str__(self):
-        return f"{self.party} {self.name}"
+        return f"{self.name}"
 
     @property
     @check_cache('party_summary_purchases')

@@ -12,7 +12,7 @@ from count.utils import party_handle
 class PurchaseAPIView(ListCreateAPIView):
 
     def get_queryset(self):
-        return Purchase.objects.filter(party_id=self.kwargs.get('party_id'))
+        return Purchase.objects.select_related('member').filter(party_id=self.kwargs.get('party_id'))
 
     def get_serializer_class(self):
         if self.request.method == 'POST':
