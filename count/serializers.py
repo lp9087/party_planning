@@ -3,7 +3,17 @@ from rest_framework import serializers
 from count.models import Party, Member, Purchase
 
 
-class MembersSerializer(serializers.ModelSerializer):
+class MembersCreateSerializer(serializers.ModelSerializer):
+
+    def create(self, validated_data):
+        return Member.objects.create(party_id=self.context.get('view').kwargs.get('party_id'), **validated_data)
+
+    class Meta:
+        model = Member
+        fields = ('user', 'name',)
+
+
+class MembersListSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Member
@@ -11,21 +21,17 @@ class MembersSerializer(serializers.ModelSerializer):
 
 
 class PurchaseCreateSerializer(serializers.ModelSerializer):
-    member = serializers.RelatedField(
-        source='member_purchase',
-        read_only=True,
-    )
+
+    def create(self, validated_data):
+        return Purchase.objects.create(party_id=self.context.get('view').kwargs.get('party_id'), **validated_data)
 
     class Meta:
         model = Purchase
-        fields = ('expenses', 'description', 'member')
+        fields = ('member', 'expenses', 'description')
 
 
 class PurchaseSerializer(serializers.ModelSerializer):
-    member = serializers.RelatedField(
-        source='member_purchase',
-        read_only=True,
-    )
+    member = serializers.StringRelatedField()
 
     class Meta:
         model = Purchase
@@ -33,7 +39,7 @@ class PurchaseSerializer(serializers.ModelSerializer):
 
 
 class ListOfPartiesSerializer(serializers.ModelSerializer):
-    members = MembersSerializer(source='member_set', many=True, read_only=True)
+    members = MembersListSerializer(source='member_set', many=True, read_only=True)
 
     class Meta:
         model = Party
@@ -41,8 +47,8 @@ class ListOfPartiesSerializer(serializers.ModelSerializer):
 
 
 class DetailPartySerializer(serializers.ModelSerializer):
-    members = MembersSerializer(source='member_set', many=True, read_only=True)
+    members = MembersListSerializer(source='member_set', many=True, read_only=True)
 
     class Meta:
         model = Party
-        fields = ('date', 'description', 'members', 'budget', 'member_count')
+        fields = ('id', 'date', 'description', 'members', 'budget', 'member_count')

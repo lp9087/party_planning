@@ -20,9 +20,15 @@ class PurchaseAPIView(ListCreateAPIView):
         return serializers.PurchaseSerializer
 
 
-class MembersViewSet(viewsets.ModelViewSet):
-    queryset = Member.objects.all()
-    serializer_class = serializers.MembersSerializer
+class MembersAPIView(ListCreateAPIView):
+
+    def get_queryset(self):
+        return Member.objects.filter(party_id=self.kwargs.get('party_id'))
+
+    def get_serializer_class(self):
+        if self.request.method == 'POST':
+            return serializers.MembersCreateSerializer
+        return serializers.MembersListSerializer
 
 
 class ListOfPartiesViewSet(viewsets.ModelViewSet):
