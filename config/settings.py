@@ -9,11 +9,15 @@ https://docs.djangoproject.com/en/4.0/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.0/ref/settings/
 """
-
+import os
+from distutils.util import strtobool
 from pathlib import Path
 
-# Build paths inside the project like this: BASE_DIR / 'subdir'.
+from dotenv import load_dotenv
+
 BASE_DIR = Path(__file__).resolve().parent.parent
+
+load_dotenv(os.path.join(BASE_DIR, ".env"))
 
 
 # Quick-start development settings - unsuitable for production
@@ -82,7 +86,15 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': BASE_DIR / 'db.sqlite3',
-    }
+    },
+    # "default2": {
+    #     "ENGINE": "django.db.backends.postgresql",
+    #     "NAME": os.getenv("POSTGRES_DB", "party"),
+    #     "USER": os.getenv("POSTGRES_USER", "postgres"),
+    #     "PASSWORD": os.getenv("POSTGRES_PASSWORD", "postgres"),
+    #     "HOST": os.getenv("POSTGRES_HOST", "localhost"),
+    #     "PORT": os.getenv("POSTGRES_PORT", "54321"),
+    # }
 }
 
 
@@ -136,7 +148,7 @@ INTERNAL_IPS = [
 CACHES = {
     'default': {
         'BACKEND': 'django_redis.cache.RedisCache',
-        'LOCATION': 'redis://default:redispw@localhost:49153',
+        'LOCATION': f"redis://default:redispw@localhost:{os.getenv('POSTGRES_DB', '6379')}",
         'OPTIONS': {
             'CLIENT_CLASS': 'django_redis.client.DefaultClient',
         }
@@ -145,3 +157,4 @@ CACHES = {
 
 AUTH_USER_MODEL = 'count.PartyUser'
 
+USE_CACHE = strtobool(os.getenv('USE_CACHE', True))

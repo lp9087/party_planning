@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from count.models import Party, Member, Purchase
+from count.models import Party, Member, Purchase, PurchaseExclude
 
 
 class MembersCreateSerializer(serializers.ModelSerializer):
@@ -52,3 +52,20 @@ class DetailPartySerializer(serializers.ModelSerializer):
     class Meta:
         model = Party
         fields = ('id', 'date', 'description', 'members', 'budget', 'member_count')
+
+
+class PurchaseExcludeCreateSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = PurchaseExclude
+        fields = ('purchase', 'member')
+
+
+class PurchaseExcludeSerializer(serializers.ModelSerializer):
+    member = MembersListSerializer(read_only=True)
+    purchase = PurchaseSerializer(read_only=True)
+
+    class Meta:
+        model = PurchaseExclude
+        fields = ('id', 'purchase', 'member')
+

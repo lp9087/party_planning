@@ -1,3 +1,5 @@
+from uuid import uuid4
+
 from django.contrib.auth.base_user import AbstractBaseUser
 from django.contrib.auth.models import PermissionsMixin
 from django.db import models
@@ -5,6 +7,7 @@ from django.db.models import Sum
 from django.core.cache import cache
 from django.utils.translation import gettext_lazy as _
 
+from config.settings import USE_CACHE
 from count.managers import CustomAccountManager
 
 
@@ -12,13 +15,17 @@ from count.managers import CustomAccountManager
 def check_cache(key):
     def func_check_cache(func):
         def checking(self):
-            cache_data = cache.get(str(self.id) + key)
-            if cache_data is None:
+            if not USE_CACHE:
                 data = func(self)
-                cache.set(str(self.id) + key, data, timeout=1)
                 return data
             else:
-                return cache_data
+                cache_data = cache.get(str(self.id) + key)
+                if cache_data is None:
+                    data = func(self)
+                    cache.set(str(self.id) + key, data, timeout=1)
+                    return data
+                else:
+                    return cache_data
         return checking
     return func_check_cache
 
@@ -50,6 +57,7 @@ class PartyUser(AbstractBaseUser, PermissionsMixin):
 
 
 class Party(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid4)
     date = models.DateField()
     description = models.CharField("Описание тусовки", max_length=255, null=True, blank=True)
 
@@ -102,7 +110,7 @@ class Member(models.Model):
 class Purchase(models.Model):
     party = models.ForeignKey(Party, on_delete=models.CASCADE, related_name='purchase')
     member = models.ForeignKey(Member, on_delete=models.CASCADE, related_name='member_purchase')
-    expenses = models.DecimalField("Потратил", decimal_places=2, max_digits=10, default=0)
+    expenses = models.FloatField("Потратил", default=0)
     description = models.CharField("Описание траты", max_length=500, blank=True, null=True)
 
     class Meta:

@@ -4,3 +4,4 @@ django-debug-toolbar==3.5.0
 redis==4.3.4
 django-redis==5.2.0
 drf-yasg==1.21.0
+python-dotenv==0.20.0
