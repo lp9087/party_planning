@@ -1,3 +1,4 @@
+from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import viewsets
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -5,8 +6,7 @@ from rest_framework.viewsets import GenericViewSet, mixins
 
 from count import serializers
 from count.models import Party, Member, Purchase, PurchaseExclude
-
-from count.utils import party_handle
+from count.utils.utils import party_handle
 
 
 class PurchaseAPIView(GenericViewSet, mixins.CreateModelMixin, mixins.ListModelMixin):
@@ -49,11 +49,11 @@ class CountExpenses(APIView):
         return Response(response)
 
 
-#TODO Добавить филтр по мемберу и по покупке
 class PurchaseExcludeAPIView(mixins.CreateModelMixin, mixins.DestroyModelMixin, mixins.ListModelMixin, GenericViewSet):
-    # TODO рпифетч на покупки и на мемберов
-    queryset = PurchaseExclude.objects.all()
+    queryset = PurchaseExclude.objects.select_related('purchase', 'member').all()
     lookup_field = 'id'
+    filter_backends = [DjangoFilterBackend]
+    filterset_fields = ['member', 'purchase']
 
     def get_serializer_class(self):
         if self.request.method == 'POST':

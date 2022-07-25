@@ -4,30 +4,9 @@ from django.contrib.auth.base_user import AbstractBaseUser
 from django.contrib.auth.models import PermissionsMixin
 from django.db import models
 from django.db.models import Sum
-from django.core.cache import cache
 from django.utils.translation import gettext_lazy as _
-
-from config.settings import USE_CACHE
 from count.managers import CustomAccountManager
-
-
-#TODO перенести его куда-то
-def check_cache(key):
-    def func_check_cache(func):
-        def checking(self):
-            if not USE_CACHE:
-                data = func(self)
-                return data
-            else:
-                cache_data = cache.get(str(self.id) + key)
-                if cache_data is None:
-                    data = func(self)
-                    cache.set(str(self.id) + key, data, timeout=1)
-                    return data
-                else:
-                    return cache_data
-        return checking
-    return func_check_cache
+from count.utils.cache import check_cache
 
 
 class PartyUser(AbstractBaseUser, PermissionsMixin):

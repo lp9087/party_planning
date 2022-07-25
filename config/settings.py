@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
+    'django_filters',
     'debug_toolbar',
     'drf_yasg',
     'count',
@@ -158,3 +159,7 @@ CACHES = {
 AUTH_USER_MODEL = 'count.PartyUser'
 
 USE_CACHE = strtobool(os.getenv('USE_CACHE', True))
+
+REST_FRAMEWORK = {
+    'DEFAULT_FILTER_BACKENDS': ['django_filters.rest_framework.DjangoFilterBackend']
+}

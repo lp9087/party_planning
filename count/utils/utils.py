@@ -1,5 +1,4 @@
 import queue
-
 from count.models import Member, Party
 
 

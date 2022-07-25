@@ -23,7 +23,6 @@ urlpatterns = [
         "post": "create",
         "get": "list",
     })),
-    #todo action
     path('api/purchase/exclude/<int:id>/', PurchaseExcludeAPIView.as_view({
         "delete": "destroy",
     })),
