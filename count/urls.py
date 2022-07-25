@@ -18,7 +18,7 @@ urlpatterns = [
         "post": "create",
         "get": "list"
     })),
-    path('api/count_exp/<uuid:id>/', CountExpenses.as_view()),
+    path('api/count_exp/<uuid:id>/', CountExpenses.as_view(), name="count_exp"),
     path('api/purchase/exclude/', PurchaseExcludeAPIView.as_view({
         "post": "create",
         "get": "list",
