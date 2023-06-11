@@ -45,8 +45,11 @@ class CountExpenses(APIView):
         response = []
         for member in party_handle(party):
             response.append(member.to_json())
-
-        return Response(response)
+        response_dict: defaultdict = defaultdict(list)
+        for member in response:
+            response_dict[member['sender']].append(f"Должен отправить человеку {member['receiver']} "
+                                                   f"сумму {round(member['money'], 2)}")
+        return Response(response_dict)
 
 
 class PurchaseExcludeAPIView(mixins.CreateModelMixin, mixins.DestroyModelMixin, mixins.ListModelMixin, GenericViewSet):
